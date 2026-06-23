@@ -22,11 +22,14 @@ import com.cinema.repository.RoomRepository;
 import com.cinema.repository.SeatRepository;
 import com.cinema.repository.SeatTypeRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin/rooms")
 @RequiredArgsConstructor
+@Tag(name = "Admin Rooms", description = "Quản lý phòng chiếu và sơ đồ ghế")
 public class AdminRoomController {
 
     private final RoomRepository roomRepository;
@@ -34,11 +37,13 @@ public class AdminRoomController {
     private final SeatTypeRepository seatTypeRepository;
 
     @GetMapping
+    @Operation(summary = "Danh sách phòng", description = "Lấy toàn bộ phòng chiếu.")
     public ResponseEntity<List<Room>> getAllRooms() {
         return ResponseEntity.ok(roomRepository.findAll());
     }
 
     @PostMapping
+    @Operation(summary = "Tạo phòng", description = "Tạo phòng mới và sinh ghế mặc định.")
     public ResponseEntity<Room> createRoom(@RequestBody Room room) {
         room = roomRepository.save(room);
         generateSeats(room);
@@ -46,6 +51,7 @@ public class AdminRoomController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Cập nhật phòng", description = "Cập nhật thông tin phòng chiếu.")
     public ResponseEntity<Room> updateRoom(@PathVariable UUID id, @RequestBody Room room) {
         Room existing = roomRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));

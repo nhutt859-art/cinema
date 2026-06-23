@@ -35,6 +35,15 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/register", "/api/auth/login",
                                   "/api/auth/forgot-password", "/api/auth/reset-password",
                                   "/api/auth/oauth2/**").permitAll()
+                .requestMatchers(
+                        "/api-docs",
+                        "/api-docs/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/swagger-ui/index.html"
+                ).permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/movies/**", "/api/genres/**", "/api/showtimes/**",
                                   "/api/combos/**", "/api/seats/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
