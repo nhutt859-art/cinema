@@ -17,21 +17,26 @@ import com.cinema.enums.EntityStatus;
 import com.cinema.exception.ResourceNotFoundException;
 import com.cinema.repository.ShowtimeRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin/showtimes")
 @RequiredArgsConstructor
+@Tag(name = "Admin Showtimes", description = "Quản lý suất chiếu và chống trùng giờ")
 public class AdminShowtimeController {
 
     private final ShowtimeRepository showtimeRepository;
 
     @GetMapping
+    @Operation(summary = "Danh sách suất chiếu", description = "Lấy toàn bộ suất chiếu.")
     public ResponseEntity<?> getAllShowtimes() {
         return ResponseEntity.ok(showtimeRepository.findAll());
     }
 
     @PostMapping
+    @Operation(summary = "Tạo suất chiếu", description = "Tạo suất chiếu mới và kiểm tra trùng giờ trong cùng phòng.")
     public ResponseEntity<?> createShowtime(@RequestBody Showtime showtime) {
         if (showtimeRepository.existsOverlappingShowtime(
                 showtime.getRoom().getRoomId(),
@@ -43,6 +48,7 @@ public class AdminShowtimeController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Cập nhật suất chiếu", description = "Cập nhật thông tin suất chiếu.")
     public ResponseEntity<?> updateShowtime(@PathVariable UUID id, @RequestBody Showtime showtime) {
         Showtime existing = showtimeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Showtime not found"));
@@ -51,6 +57,7 @@ public class AdminShowtimeController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Hủy suất chiếu", description = "Đánh dấu suất chiếu là CANCELLED.")
     public ResponseEntity<Void> cancelShowtime(@PathVariable UUID id) {
         Showtime showtime = showtimeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Showtime not found"));

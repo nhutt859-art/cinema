@@ -15,21 +15,26 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cinema.dto.response.SeatResponse;
 import com.cinema.service.SeatService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/seats")
 @RequiredArgsConstructor
+@Tag(name = "Seats", description = "Xem sơ đồ ghế và khóa/nhả ghế realtime")
 public class SeatController {
 
     private final SeatService seatService;
 
     @GetMapping("/showtime/{showtimeId}")
+    @Operation(summary = "Sơ đồ ghế của suất chiếu", description = "Lấy danh sách ghế theo suất chiếu.")
     public ResponseEntity<List<SeatResponse>> getSeatsByShowtime(@PathVariable UUID showtimeId) {
         return ResponseEntity.ok(seatService.getSeatsByShowtime(showtimeId));
     }
 
     @PostMapping("/lock")
+    @Operation(summary = "Khóa ghế tạm thời", description = "Khóa danh sách ghế trong khi người dùng đang đặt vé.")
     public ResponseEntity<Void> lockSeats(@RequestBody Map<String, Object> request) {
         UUID showtimeId = UUID.fromString((String) request.get("showtimeId"));
         @SuppressWarnings("unchecked")
@@ -42,6 +47,7 @@ public class SeatController {
     }
 
     @PostMapping("/unlock")
+    @Operation(summary = "Nhả ghế", description = "Nhả danh sách ghế đã khóa tạm thời.")
     public ResponseEntity<Void> unlockSeats(@RequestBody Map<String, Object> request) {
         UUID showtimeId = UUID.fromString((String) request.get("showtimeId"));
         @SuppressWarnings("unchecked")

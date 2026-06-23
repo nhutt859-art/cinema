@@ -19,32 +19,39 @@ import com.cinema.enums.EntityStatus;
 import com.cinema.exception.ResourceNotFoundException;
 import com.cinema.repository.MovieRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin/movies")
 @RequiredArgsConstructor
+@Tag(name = "Admin Movies", description = "Quản lý phim, bao gồm thêm/sửa/xóa mềm")
 public class AdminMovieController {
 
     private final MovieRepository movieRepository;
 
     @GetMapping
+    @Operation(summary = "Danh sách phim admin", description = "Lấy toàn bộ phim theo phân trang.")
     public ResponseEntity<Page<Movie>> getAllMovies(Pageable pageable) {
         return ResponseEntity.ok(movieRepository.findAll(pageable));
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Chi tiết phim admin", description = "Lấy phim theo ID.")
     public ResponseEntity<Movie> getMovie(@PathVariable UUID id) {
         return ResponseEntity.ok(movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found")));
     }
 
     @PostMapping
+    @Operation(summary = "Tạo phim", description = "Tạo mới phim.")
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
         return ResponseEntity.ok(movieRepository.save(movie));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Cập nhật phim", description = "Cập nhật thông tin phim.")
     public ResponseEntity<Movie> updateMovie(@PathVariable UUID id, @RequestBody Movie movie) {
         Movie existing = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
@@ -53,6 +60,7 @@ public class AdminMovieController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Xóa mềm phim", description = "Đổi trạng thái phim sang INACTIVE thay vì xóa cứng.")
     public ResponseEntity<Void> softDeleteMovie(@PathVariable UUID id) {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));

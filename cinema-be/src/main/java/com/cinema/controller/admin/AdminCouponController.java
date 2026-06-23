@@ -19,26 +19,32 @@ import com.cinema.enums.EntityStatus;
 import com.cinema.exception.ResourceNotFoundException;
 import com.cinema.repository.CouponRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin/coupons")
 @RequiredArgsConstructor
+@Tag(name = "Admin Coupons", description = "Quản lý mã giảm giá")
 public class AdminCouponController {
 
     private final CouponRepository couponRepository;
 
     @GetMapping
+    @Operation(summary = "Danh sách coupon admin", description = "Lấy danh sách coupon theo phân trang.")
     public ResponseEntity<Page<Coupon>> getAllCoupons(Pageable pageable) {
         return ResponseEntity.ok(couponRepository.findAll(pageable));
     }
 
     @PostMapping
+    @Operation(summary = "Tạo coupon", description = "Tạo mới mã giảm giá.")
     public ResponseEntity<Coupon> createCoupon(@RequestBody Coupon coupon) {
         return ResponseEntity.ok(couponRepository.save(coupon));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Cập nhật coupon", description = "Cập nhật thông tin mã giảm giá.")
     public ResponseEntity<Coupon> updateCoupon(@PathVariable UUID id, @RequestBody Coupon coupon) {
         Coupon existing = couponRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
@@ -47,6 +53,7 @@ public class AdminCouponController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Xóa mềm coupon", description = "Đổi trạng thái coupon sang INACTIVE thay vì xóa cứng.")
     public ResponseEntity<Void> deleteCoupon(@PathVariable UUID id) {
         Coupon coupon = couponRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));

@@ -18,17 +18,21 @@ import com.cinema.dto.response.BookingResponse;
 import com.cinema.security.UserPrincipal;
 import com.cinema.service.BookingService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
+@Tag(name = "Bookings", description = "Đặt vé, xem lịch sử và chi tiết hóa đơn")
 public class BookingController {
 
     private final BookingService bookingService;
 
     @PostMapping
+    @Operation(summary = "Tạo booking", description = "Tạo đơn đặt vé từ ghế, combo và mã giảm giá.")
     public ResponseEntity<BookingResponse> createBooking(
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody BookingRequest request) {
@@ -36,6 +40,7 @@ public class BookingController {
     }
 
     @GetMapping
+    @Operation(summary = "Lịch sử đặt vé", description = "Lấy danh sách booking của người dùng hiện tại.")
     public ResponseEntity<Page<BookingResponse>> getUserBookings(
             @AuthenticationPrincipal UserPrincipal principal,
             Pageable pageable) {
@@ -43,6 +48,7 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Chi tiết booking", description = "Lấy chi tiết một booking theo ID.")
     public ResponseEntity<BookingResponse> getBookingDetail(
             @PathVariable UUID id,
             @AuthenticationPrincipal UserPrincipal principal) {
