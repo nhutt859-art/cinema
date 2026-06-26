@@ -3,7 +3,6 @@ package com.cinema.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,14 +35,14 @@ public class MovieService {
         return movies.map(this::toMovieResponse);
     }
 
-    public List<MovieResponse> getNowShowing() {
-        return movieRepository.findNowShowing(LocalDate.now())
-                .stream().map(this::toMovieResponse).collect(Collectors.toList());
+    public Page<MovieResponse> getNowShowing(Pageable pageable) {
+        return movieRepository.findNowShowing(LocalDate.now(), pageable)
+                .map(this::toMovieResponse);
     }
 
-    public List<MovieResponse> getComingSoon() {
-        return movieRepository.findComingSoon(LocalDate.now())
-                .stream().map(this::toMovieResponse).collect(Collectors.toList());
+    public Page<MovieResponse> getComingSoon(Pageable pageable) {
+        return movieRepository.findComingSoon(LocalDate.now(), pageable)
+                .map(this::toMovieResponse);
     }
 
     public MovieResponse getMovieDetail(UUID movieId) {
@@ -71,9 +70,12 @@ public class MovieService {
                 .description(movie.getDescription())
                 .duration(movie.getDuration())
                 .language(movie.getLanguage())
+                .languageDisplay(movie.getLanguageDisplay())
                 .ageRating(movie.getAgeRating().name())
                 .trailerUrl(movie.getTrailerUrl())
                 .posterUrl(movie.getPosterUrl())
+                .director(movie.getDirector())
+                .actors(movie.getActors())
                 .showingStartDate(movie.getShowingStartDate())
                 .showingEndDate(movie.getShowingEndDate())
                 .status(movie.getStatus().name())

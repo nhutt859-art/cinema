@@ -33,10 +33,10 @@ INSERT INTO genres (genre_id, name, slug) VALUES
 ON CONFLICT DO NOTHING;
 
 -- Movies
-INSERT INTO movies (movie_id, title, description, duration, language, age_rating, trailer_url, poster_url, showing_start_date, showing_end_date, status) VALUES
-    ('c0000001-0000-0000-0000-000000000001', 'Avengers: Endgame', 'Biet doi sieu anh hung tap hop lan cuoi', 181, 'Tieng Anh', 'T13', 'https://www.youtube.com/watch?v=TcMBFSGVi1c', 'https://picsum.photos/seed/movie1/300/450', '2026-06-01', '2026-07-15', 'ACTIVE'),
-    ('c0000001-0000-0000-0000-000000000002', 'Doraemon', 'Chuyen phieu luu am nhac cua Nobita', 115, 'Tieng Viet', 'P', NULL, NULL, '2026-06-05', '2026-07-20', 'ACTIVE'),
-    ('c0000001-0000-0000-0000-000000000003', 'Inside Out 2', 'Phan tiep theo cua bo phim hoat hinh dinh dam', 100, 'Tieng Anh', 'P', NULL, NULL, '2026-06-20', '2026-08-01', 'COMING_SOON')
+INSERT INTO movies (movie_id, title, description, duration, language, language_display, age_rating, trailer_url, poster_url, showing_start_date, showing_end_date, status, director, actors) VALUES
+    ('c0000001-0000-0000-0000-000000000001', 'Avengers: Endgame', 'Biet doi sieu anh hung tap hop lan cuoi', 181, 'Tieng Anh', 'Tiếng Anh - Phụ đề Tiếng Việt', 'T13', 'https://www.youtube.com/watch?v=TcMBFSGVi1c', 'https://picsum.photos/seed/movie1/300/450', '2026-06-01', '2026-07-15', 'ACTIVE', 'Anthony Russo', 'Robert Downey Jr., Chris Evans, Scarlett Johansson'),
+    ('c0000001-0000-0000-0000-000000000002', 'Doraemon', 'Chuyen phieu luu am nhac cua Nobita', 115, 'Tieng Viet', 'Tiếng Việt', 'P', NULL, NULL, '2026-06-05', '2026-07-20', 'ACTIVE', 'Đang cập nhật', 'Đang cập nhật'),
+    ('c0000001-0000-0000-0000-000000000003', 'Inside Out 2', 'Phan tiep theo cua bo phim hoat hinh dinh dam', 100, 'Tieng Anh', 'Tiếng Anh - Phụ đề Tiếng Việt', 'P', NULL, NULL, '2026-06-20', '2026-08-01', 'COMING_SOON', 'Kelsey Mann', 'Amy Poehler, Maya Hawke')
 ON CONFLICT DO NOTHING;
 
 -- Movie genres
@@ -116,11 +116,11 @@ INSERT INTO genres (genre_id, name, slug) VALUES
 ON CONFLICT DO NOTHING;
 
 -- Additional movies
-INSERT INTO movies (movie_id, title, description, duration, language, age_rating, trailer_url, poster_url, showing_start_date, showing_end_date, status) VALUES
-    ('c0000001-0000-0000-0000-000000000004', 'The Batman', 'Batman doi mat voi cau do tu ten toi pham bi an Riddler', 176, 'Tieng Anh', 'T16', NULL, 'https://picsum.photos/seed/movie4/300/450', '2026-06-01', '2026-07-30', 'ACTIVE'),
-    ('c0000001-0000-0000-0000-000000000005', 'Interstellar', 'Chuyen phieu luu vu tru de tim hanh tinh moi cho nhan loai', 169, 'Tieng Anh', 'P', NULL, 'https://picsum.photos/seed/movie5/300/450', '2026-06-10', '2026-08-15', 'ACTIVE'),
-    ('c0000001-0000-0000-0000-000000000006', 'Spider-Man: No Way Home', 'Peter Parker doi mat voi hau qua khi bi lo thanh phan bi mat', 148, 'Tieng Anh', 'T13', NULL, 'https://picsum.photos/seed/movie6/300/450', '2026-06-05', '2026-07-25', 'ACTIVE'),
-    ('c0000001-0000-0000-0000-000000000007', 'Fast & Furious X', 'Gia dinh Toretto doi mat voi sat thu nguy hiem nhat tu qua khu', 141, 'Tieng Anh', 'T16', NULL, 'https://picsum.photos/seed/movie7/300/450', '2026-06-15', '2026-08-10', 'ACTIVE')
+INSERT INTO movies (movie_id, title, description, duration, language, language_display, age_rating, trailer_url, poster_url, showing_start_date, showing_end_date, status, director, actors) VALUES
+    ('c0000001-0000-0000-0000-000000000004', 'The Batman', 'Batman doi mat voi cau do tu ten toi pham bi an Riddler', 176, 'Tieng Anh', 'Tiếng Anh - Phụ đề Tiếng Việt', 'T16', NULL, 'https://picsum.photos/seed/movie4/300/450', '2026-06-01', '2026-07-30', 'ACTIVE', 'Matt Reeves', 'Robert Pattinson, Zoë Kravitz, Paul Dano'),
+    ('c0000001-0000-0000-0000-000000000005', 'Interstellar', 'Chuyen phieu luu vu tru de tim hanh tinh moi cho nhan loai', 169, 'Tieng Anh', 'Tiếng Anh - Phụ đề Tiếng Việt', 'P', NULL, 'https://picsum.photos/seed/movie5/300/450', '2026-06-10', '2026-08-15', 'ACTIVE', 'Christopher Nolan', 'Matthew McConaughey, Anne Hathaway, Jessica Chastain'),
+    ('c0000001-0000-0000-0000-000000000006', 'Spider-Man: No Way Home', 'Peter Parker doi mat voi hau qua khi bi lo thanh phan bi mat', 148, 'Tieng Anh', 'Tiếng Anh - Phụ đề Tiếng Việt', 'T13', NULL, 'https://picsum.photos/seed/movie6/300/450', '2026-06-05', '2026-07-25', 'ACTIVE', 'Jon Watts', 'Tom Holland, Zendaya, Benedict Cumberbatch'),
+    ('c0000001-0000-0000-0000-000000000007', 'Fast & Furious X', 'Gia dinh Toretto doi mat voi sat thu nguy hiem nhat tu qua khu', 141, 'Tieng Anh', 'Tiếng Anh - Phụ đề Tiếng Việt', 'T16', NULL, 'https://picsum.photos/seed/movie7/300/450', '2026-06-15', '2026-08-10', 'ACTIVE', 'Louis Leterrier', 'Vin Diesel, Jason Momoa, Michelle Rodriguez')
 ON CONFLICT DO NOTHING;
 
 -- Additional movie genres

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, ChevronRight, Play, Clock, Star } from 'lucide-react'
+import { Search, Play, Clock, Star } from 'lucide-react'
 import movieApi from '../api/movieApi'
 import Badge from '../components/ui/Badge'
 import Loading from '../components/ui/Loading'
@@ -18,42 +18,77 @@ export default function Home() {
   const [genres, setGenres] = useState([])
   const [selectedGenres, setSelectedGenres] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [loading, setLoading] = useState(true)
-  const [heroMovie, setHeroMovie] = useState(null)
+  const [heroIndex, setHeroIndex] = useState(0)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const pageSize = 12
 
   useEffect(() => {
     movieApi.getGenres().then(r => setGenres(r.data)).catch(() => {})
   }, [])
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery)
+      setCurrentPage(0)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  useEffect(() => {
+    setCurrentPage(0)
+  }, [activeTab])
+
+  useEffect(() => {
+    setCurrentPage(0)
+  }, [selectedGenres])
+
+  useEffect(() => {
     setLoading(true)
-    const fetch = activeTab === 'now-showing' ? movieApi.getNowShowing() : movieApi.getComingSoon()
+    const params = { page: currentPage, size: pageSize }
+    let fetch
+    if (debouncedQuery) {
+      fetch = movieApi.searchMovies(debouncedQuery, params)
+    } else if (selectedGenres.length > 0) {
+      fetch = movieApi.filterByGenres(selectedGenres, params)
+    } else {
+      fetch = activeTab === 'now-showing' ? movieApi.getNowShowing(params) : movieApi.getComingSoon(params)
+    }
     fetch
       .then(r => {
-        const data = r.data?.content || r.data || []
+        const data = r.data?.content || []
         setMovies(data)
-        if (data.length > 0 && activeTab === 'now-showing') setHeroMovie(data[0])
+        setTotalPages(r.data?.totalPages || 0)
+        setHeroIndex(0)
       })
       .catch(() => setMovies([]))
       .finally(() => setLoading(false))
-  }, [activeTab])
+  }, [activeTab, currentPage, debouncedQuery, selectedGenres])
 
-  const filtered = movies.filter(m => {
-    const matchSearch = m.title?.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchGenre = selectedGenres.length === 0 || m.genres?.some(g => selectedGenres.includes(g.genreId))
-    return matchSearch && matchGenre
-  })
+  useEffect(() => {
+    if (movies.length <= 1) return
+    const timer = setInterval(() => {
+      setHeroIndex(prev => (prev + 1) % movies.length)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [movies])
+
+
 
   return (
     <div>
       {/* Hero Section */}
-      {heroMovie && activeTab === 'now-showing' && (
+      {movies.length > 0 && movies[heroIndex] && (() => {
+        const h = movies[heroIndex]
+        return (
         <section className="relative h-[55vh] min-h-[380px] overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-space-dark/40 via-space-dark/70 to-space-dark" />
           <div className="absolute inset-0 bg-galaxy-hero" />
           <div
             className="absolute inset-0 bg-cover bg-center scale-110"
-            style={{ backgroundImage: `url(${heroMovie.posterUrl})`, filter: 'blur(8px) brightness(0.3)' }}
+            style={{ backgroundImage: `url(${h.posterUrl})`, filter: 'blur(8px) brightness(0.3)' }}
           />
           <div className="relative z-10 h-full max-w-7xl mx-auto px-4 flex items-center">
             <motion.div
@@ -62,22 +97,22 @@ export default function Home() {
               className="max-w-xl"
             >
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant={heroMovie.ageRating}>{heroMovie.ageRating}</Badge>
+                <Badge variant={h.ageRating}>{h.ageRating}</Badge>
                 <span className="text-text-muted text-sm flex items-center gap-1">
-                  <Clock size={14} /> {heroMovie.duration} phút
+                  <Clock size={14} /> {h.duration} phút
                 </span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-bold mb-3">{heroMovie.title}</h1>
-              <p className="text-text-secondary text-base mb-4 line-clamp-2">{heroMovie.description}</p>
+              <h1 className="text-3xl md:text-5xl font-bold mb-3">{h.title}</h1>
+              <p className="text-text-secondary text-base mb-4 line-clamp-2">{h.description}</p>
               <div className="flex items-center gap-3">
                 <Link
-                  to={`/movies/${heroMovie.movieId || heroMovie.id}`}
+                  to={`/movies/${h.movieId || h.id}`}
                   className="btn-primary flex items-center gap-2 py-2.5 px-6"
                 >
                   <Play size={18} /> Đặt Vé Ngay
                 </Link>
                 <Link
-                  to={`/movies/${heroMovie.movieId || heroMovie.id}`}
+                  to={`/movies/${h.movieId || h.id}`}
                   className="btn-secondary flex items-center gap-2 py-2.5 px-6"
                 >
                   Xem Trailer
@@ -85,8 +120,23 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
+          {movies.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {movies.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setHeroIndex(i)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    i === heroIndex
+                      ? 'w-6 bg-galaxy-cyan'
+                      : 'bg-white/30 hover:bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </section>
-      )}
+      )})()}
 
       <div className="max-w-7xl mx-auto px-4 -mt-8 relative z-20 mb-8">
         {/* Search */}
@@ -150,17 +200,17 @@ export default function Home() {
         {/* Movie grid */}
         {loading ? (
           <Loading />
-        ) : filtered.length === 0 ? (
+        ) : movies.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-text-muted">Không tìm thấy phim phù hợp</p>
           </div>
         ) : (
           <motion.div
             layout
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8"
+            className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 mb-8"
           >
             <AnimatePresence mode="popLayout">
-              {filtered.map((movie, i) => (
+              {movies.map((movie, i) => (
                 <motion.div
                   key={movie.movieId || movie.id}
                   layout
@@ -193,7 +243,7 @@ export default function Home() {
                         </div>
                       )}
                     </div>
-                    <div className="p-3">
+                    <div className="p-2.5">
                       <h3 className="font-medium text-xs leading-tight line-clamp-1 group-hover:text-galaxy-cyan transition-colors">
                         {movie.title}
                       </h3>
@@ -216,6 +266,39 @@ export default function Home() {
               ))}
             </AnimatePresence>
           </motion.div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mb-8">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+              disabled={currentPage === 0}
+              className="px-3 py-1.5 rounded-lg bg-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-all text-sm"
+            >
+              Trước
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i)}
+                className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
+                  i === currentPage
+                    ? 'bg-galaxy-cyan text-space-dark'
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+              disabled={currentPage === totalPages - 1}
+              className="px-3 py-1.5 rounded-lg bg-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-all text-sm"
+            >
+              Sau
+            </button>
+          </div>
         )}
       </div>
     </div>

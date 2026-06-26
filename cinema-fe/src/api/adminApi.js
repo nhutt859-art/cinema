@@ -7,23 +7,27 @@ const adminApi = {
   deleteMovie: (id) => axiosClient.delete(`/admin/movies/${id}`),
 
   getRooms: () => axiosClient.get('/admin/rooms'),
+  getSeatTypes: () => axiosClient.get('/admin/rooms/seat-types'),
   createRoom: (data) => axiosClient.post('/admin/rooms', data),
   updateRoom: (id, data) => axiosClient.put(`/admin/rooms/${id}`, data),
+  deleteRoom: (id) => axiosClient.delete(`/admin/rooms/${id}`),
 
-  getShowtimes: () => axiosClient.get('/admin/showtimes'),
+  getShowtimes: (params) => axiosClient.get('/admin/showtimes', { params }),
   createShowtime: (data) => axiosClient.post('/admin/showtimes', data),
+  batchCancelShowtimes: (ids) => axiosClient.post('/admin/showtimes/batch-cancel', ids),
   cancelShowtime: (id) => axiosClient.delete(`/admin/showtimes/${id}`),
 
   getCoupons: (params) => axiosClient.get('/admin/coupons', { params }),
   createCoupon: (data) => axiosClient.post('/admin/coupons', data),
+  updateCoupon: (id, data) => axiosClient.put(`/admin/coupons/${id}`, data),
   deleteCoupon: (id) => axiosClient.delete(`/admin/coupons/${id}`),
 
   getCombos: (params) => axiosClient.get('/admin/combos', { params }),
   createCombo: (data) => axiosClient.post('/admin/combos', data),
+  updateCombo: (id, data) => axiosClient.put(`/admin/combos/${id}`, data),
   deleteCombo: (id) => axiosClient.delete(`/admin/combos/${id}`),
 
   getDashboard: () => axiosClient.get('/admin/statistics/dashboard'),
-  getRevenue: (params) => axiosClient.get('/admin/statistics/revenue', { params }),
 }
 
 export default adminApi

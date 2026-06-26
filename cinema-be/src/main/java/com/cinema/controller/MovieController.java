@@ -32,13 +32,13 @@ public class MovieController {
     }
 
     @GetMapping("/now-showing")
-    public ResponseEntity<List<MovieResponse>> getNowShowing() {
-        return ResponseEntity.ok(movieService.getNowShowing());
+    public ResponseEntity<Page<MovieResponse>> getNowShowing(Pageable pageable) {
+        return ResponseEntity.ok(movieService.getNowShowing(pageable));
     }
 
     @GetMapping("/coming-soon")
-    public ResponseEntity<List<MovieResponse>> getComingSoon() {
-        return ResponseEntity.ok(movieService.getComingSoon());
+    public ResponseEntity<Page<MovieResponse>> getComingSoon(Pageable pageable) {
+        return ResponseEntity.ok(movieService.getComingSoon(pageable));
     }
 
     @GetMapping("/search")

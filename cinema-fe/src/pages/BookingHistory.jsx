@@ -1,19 +1,25 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Clock, Film, Ticket, ChevronRight, AlertCircle } from 'lucide-react'
+import { Clock, Film, Ticket, ChevronRight, AlertCircle, XCircle } from 'lucide-react'
 import bookingApi from '../api/bookingApi'
 import Badge from '../components/ui/Badge'
 import Loading from '../components/ui/Loading'
 
-const statusMap = { PAID: 'Đã thanh toán', PENDING: 'Chờ thanh toán', CANCELLED: 'Đã hủy' }
+const statusMap = { PAID: 'Đã thanh toán', PENDING: 'Chờ thanh toán', CANCELLED: 'Đã hủy', REFUNDED: 'Đã hoàn tiền' }
 
 export default function BookingHistory() {
+  const queryClient = useQueryClient()
   const { data, isLoading, error } = useQuery({
     queryKey: ['bookings'],
     queryFn: () => bookingApi.getUserBookings({ page: 0, size: 20 }).then(r => r.data),
   })
 
-  const bookings = data?.content || data || []
+  const cancelMutation = useMutation({
+    mutationFn: (id) => bookingApi.cancelBooking(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bookings'] }),
+  })
+
+  const bookings = Array.isArray(data?.content) ? data.content : Array.isArray(data) ? data : []
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -56,6 +62,19 @@ export default function BookingHistory() {
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-white/5">
                 <span className="font-bold galaxy-text-gradient">{booking.totalAmount?.toLocaleString()}₫</span>
+                {booking.bookingStatus === 'PAID' && new Date(booking.showtimeStart).getTime() - Date.now() > 2 * 60 * 60 * 1000 && (
+                  <button
+                    onClick={() => {
+                      if (confirm('Hủy vé này? Tiền sẽ được hoàn lại 100%.')) {
+                        cancelMutation.mutate(booking.bookingId)
+                      }
+                    }}
+                    disabled={cancelMutation.isPending}
+                    className="text-red-400 hover:text-red-300 disabled:opacity-50 text-sm flex items-center gap-1 transition-colors"
+                  >
+                    <XCircle size={14} /> Hủy vé
+                  </button>
+                )}
               </div>
             </motion.div>
           ))}

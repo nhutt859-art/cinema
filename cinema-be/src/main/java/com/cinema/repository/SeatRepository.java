@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,4 +23,10 @@ public interface SeatRepository extends JpaRepository<Seat, UUID> {
     List<Seat> findActiveSeatsByRoom(@Param("roomId") UUID roomId);
 
     long countByRoomRoomId(UUID roomId);
+
+    void deleteByRoomRoomId(UUID roomId);
+
+    @Modifying
+    @Query("DELETE FROM Seat s WHERE s.room.roomId = :roomId")
+    void deleteSeatsByRoomId(@Param("roomId") UUID roomId);
 }

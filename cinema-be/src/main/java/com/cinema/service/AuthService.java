@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cinema.dto.request.ChangePasswordRequest;
 import com.cinema.dto.request.ForgotPasswordRequest;
 import com.cinema.dto.request.LoginRequest;
 import com.cinema.dto.request.RegisterRequest;
@@ -93,6 +94,19 @@ public class AuthService {
         User user = userRepository.findById(java.util.UUID.fromString(principal.getUserId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại"));
         return toProfileResponse(user);
+    }
+
+    @Transactional
+    public void changePassword(UserPrincipal principal, ChangePasswordRequest request) {
+        User user = userRepository.findById(java.util.UUID.fromString(principal.getUserId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại"));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new BadRequestException("Mật khẩu hiện tại không đúng");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
     private ProfileResponse toProfileResponse(User user) {

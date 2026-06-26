@@ -19,11 +19,13 @@ public interface MovieRepository extends JpaRepository<Movie, UUID> {
 
     Page<Movie> findByStatus(EntityStatus status, Pageable pageable);
 
+    long countByStatus(EntityStatus status);
+
     @Query("SELECT m FROM Movie m WHERE m.showingStartDate <= :today AND m.showingEndDate >= :today AND m.status = 'ACTIVE'")
-    List<Movie> findNowShowing(@Param("today") LocalDate today);
+    Page<Movie> findNowShowing(@Param("today") LocalDate today, Pageable pageable);
 
     @Query("SELECT m FROM Movie m WHERE m.showingStartDate > :today AND m.status = 'COMING_SOON'")
-    List<Movie> findComingSoon(@Param("today") LocalDate today);
+    Page<Movie> findComingSoon(@Param("today") LocalDate today, Pageable pageable);
 
     @Query("SELECT m FROM Movie m WHERE LOWER(m.title) LIKE LOWER(CONCAT('%', :keyword, '%')) AND m.status IN :statuses")
     Page<Movie> searchByTitle(@Param("keyword") String keyword, @Param("statuses") List<EntityStatus> statuses, Pageable pageable);

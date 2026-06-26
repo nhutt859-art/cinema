@@ -10,6 +10,13 @@ import { useAuth } from '../contexts/AuthContext'
 import Loading from '../components/ui/Loading'
 import Button from '../components/ui/Button'
 
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 export default function SeatSelection() {
   const { showtimeId } = useParams()
   const navigate = useNavigate()
@@ -51,6 +58,18 @@ export default function SeatSelection() {
     )
   }, [user, navigate])
 
+  const toggleCouplePair = useCallback((first, second) => {
+    if (!user) return navigate('/login')
+    const pair = second ? [first, second] : [first]
+    setSelectedSeats(prev => {
+      const hasAny = pair.some(s => prev.some(p => p.seatId === s.seatId))
+      if (hasAny) {
+        return prev.filter(s => !pair.some(p => p.seatId === s.seatId))
+      }
+      return prev.length + pair.length > 8 ? prev : [...prev, ...pair]
+    })
+  }, [user, navigate])
+
   const handleContinue = async () => {
     if (!user) return navigate('/login')
     setLocking(true)
@@ -71,6 +90,14 @@ export default function SeatSelection() {
 
   const rows = [...new Set(seats.map(s => s.rowLabel))].sort()
   const total = selectedSeats.reduce((sum, s) => sum + s.calculatedPrice, 0)
+
+  const seatTypeMap = new Map()
+  seats.forEach(s => {
+    if (!seatTypeMap.has(s.seatTypeName)) {
+      seatTypeMap.set(s.seatTypeName, { name: s.seatTypeName, color: s.colorHex })
+    }
+  })
+  const seatTypes = [...seatTypeMap.values()]
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -98,54 +125,178 @@ export default function SeatSelection() {
 
         {/* Seat grid */}
         <div className="space-y-1.5 overflow-x-auto">
-          {rows.map(row => (
-            <div key={row} className="flex items-center justify-center gap-1 min-w-fit">
-              <span className="w-5 text-right text-xs text-text-muted mr-1">{row}</span>
-              {seats.filter(s => s.rowLabel === row).sort((a, b) => a.seatNumber - b.seatNumber).map(seat => {
-                const isSelected = selectedSeats.some(s => s.seatId === seat.seatId)
-                const isLocked = seat.status === 'LOCKED'
-                const isSold = seat.status === 'SOLD'
-                return (
-                  <motion.button
-                    key={seat.seatId}
-                    whileTap={isLocked || isSold ? {} : { scale: 0.9 }}
-                    onClick={() => toggleSeat(seat)}
-                    disabled={isLocked || isSold}
-                    className={`w-8 h-8 md:w-10 md:h-10 text-xs rounded-lg transition-all duration-200 ${
-                      isSold ? 'bg-red-500/30 cursor-not-allowed border border-red-500/20'
-                        : isLocked ? 'bg-orange-500/30 cursor-not-allowed border border-orange-500/20'
-                          : isSelected ? 'bg-galaxy-pink text-white shadow-lg shadow-galaxy-pink/30 border border-galaxy-pink/50'
-                            : 'bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/30'
-                    }`}
-                    title={
-                      isSold ? `${seat.rowLabel}${seat.seatNumber} - Đã bán`
-                        : isLocked ? `${seat.rowLabel}${seat.seatNumber} - Có người đang giữ`
-                          : `${seat.rowLabel}${seat.seatNumber} - ${seat.calculatedPrice?.toLocaleString()}₫`
+          {rows.map(row => {
+            const rowSeats = seats.filter(s => s.rowLabel === row)
+              .sort((a, b) => a.seatNumber - b.seatNumber)
+            const isCoupleRow = rowSeats[0]?.seatTypeName === 'Couple'
+
+            return (
+              <div key={row} className="flex items-center justify-center gap-1 min-w-fit">
+                <span className="w-5 text-right text-xs text-text-muted mr-1">{row}</span>
+
+                {isCoupleRow ? (
+                  Array.from(
+                    { length: Math.ceil(rowSeats.length / 2) },
+                    (_, i) => rowSeats.slice(i * 2, i * 2 + 2)
+                  ).map((pair) => {
+                    const [first, second] = pair
+                    const color = first.colorHex || '#4CAF50'
+                    const isSelected = pair.some(s => selectedSeats.some(p => p.seatId === s.seatId))
+                    const isLocked = pair.some(s => s.status === 'LOCKED')
+                    const isSold = pair.some(s => s.status === 'SOLD')
+                    const pairPrice = pair.reduce((sum, s) => sum + (s.calculatedPrice || 0), 0)
+
+                    let bgColor, borderColor, shadow, textColor, extraBg
+                    if (isSold) {
+                      bgColor = 'rgba(128,128,128,0.15)'
+                      borderColor = 'rgba(128,128,128,0.1)'
+                      textColor = 'rgba(128,128,128,0.5)'
+                      extraBg = 'linear-gradient(135deg, transparent 45%, rgba(160,160,160,0.35) 48%, rgba(160,160,160,0.35) 52%, transparent 55%), linear-gradient(225deg, transparent 45%, rgba(160,160,160,0.35) 48%, rgba(160,160,160,0.35) 52%, transparent 55%)'
+                    } else if (isLocked) {
+                      bgColor = hexToRgba(color, 0.35)
+                      borderColor = hexToRgba(color, 0.2)
+                      textColor = hexToRgba(color, 0.7)
+                    } else if (isSelected) {
+                      bgColor = color
+                      borderColor = color
+                      shadow = `0 0 12px ${hexToRgba(color, 0.5)}`
+                      textColor = '#fff'
+                    } else {
+                      bgColor = hexToRgba(color, 0.15)
+                      borderColor = hexToRgba(color, 0.3)
+                      textColor = color
                     }
-                  >
-                    {seat.seatNumber}
-                  </motion.button>
-                )
-              })}
-              <span className="w-5 text-left text-xs text-text-muted ml-1">{row}</span>
-            </div>
-          ))}
+
+                    const tooltipLabel = isSold
+                      ? `${first.rowLabel}${first.seatNumber}${second ? '-' + second.seatNumber : ''} - Đã bán`
+                      : isLocked
+                        ? `${first.rowLabel}${first.seatNumber}${second ? '-' + second.seatNumber : ''} - Có người đang giữ`
+                        : `${first.rowLabel}${first.seatNumber}${second ? '-' + second.seatNumber : ''} - ${pairPrice.toLocaleString()}₫`
+
+                    return (
+                      <motion.button
+                        key={first.seatId}
+                        whileTap={isLocked || isSold ? {} : { scale: 0.95 }}
+                        whileHover={isLocked || isSold ? {} : { scale: 1.04 }}
+                        onClick={() => toggleCouplePair(first, second)}
+                        disabled={isLocked || isSold}
+                        className="h-8 md:h-10 text-xs rounded-lg transition-all duration-200 flex items-center justify-center font-medium"
+                        style={{
+                          width: second ? '68px' : '32px',
+                          background: extraBg ? `${extraBg}, ${bgColor}` : bgColor,
+                          borderColor: borderColor,
+                          borderWidth: 1,
+                          borderStyle: 'solid',
+                          color: textColor,
+                          boxShadow: shadow || 'none',
+                          cursor: isLocked || isSold ? 'not-allowed' : 'pointer',
+                        }}
+                        title={tooltipLabel}
+                      >
+                        {first.seatNumber}{second ? `-${second.seatNumber}` : ''}
+                      </motion.button>
+                    )
+                  })
+                ) : (
+                  rowSeats.map(seat => {
+                    const color = seat.colorHex || '#4CAF50'
+                    const isSelected = selectedSeats.some(s => s.seatId === seat.seatId)
+                    const isLocked = seat.status === 'LOCKED'
+                    const isSold = seat.status === 'SOLD'
+
+                    let bgColor, borderColor, shadow, textColor, extraBg
+                    if (isSold) {
+                      bgColor = 'rgba(128,128,128,0.15)'
+                      borderColor = 'rgba(128,128,128,0.1)'
+                      textColor = 'rgba(128,128,128,0.5)'
+                      extraBg = 'linear-gradient(135deg, transparent 45%, rgba(160,160,160,0.35) 48%, rgba(160,160,160,0.35) 52%, transparent 55%), linear-gradient(225deg, transparent 45%, rgba(160,160,160,0.35) 48%, rgba(160,160,160,0.35) 52%, transparent 55%)'
+                    } else if (isLocked) {
+                      bgColor = hexToRgba(color, 0.35)
+                      borderColor = hexToRgba(color, 0.2)
+                      textColor = hexToRgba(color, 0.7)
+                    } else if (isSelected) {
+                      bgColor = color
+                      borderColor = color
+                      shadow = `0 0 12px ${hexToRgba(color, 0.5)}`
+                      textColor = '#fff'
+                    } else {
+                      bgColor = hexToRgba(color, 0.15)
+                      borderColor = hexToRgba(color, 0.3)
+                      textColor = color
+                    }
+
+                    return (
+                      <motion.button
+                        key={seat.seatId}
+                        whileTap={isLocked || isSold ? {} : { scale: 0.9 }}
+                        whileHover={isLocked || isSold ? {} : { scale: 1.08 }}
+                        onClick={() => toggleSeat(seat)}
+                        disabled={isLocked || isSold}
+                        className="w-8 md:w-10 h-8 md:h-10 text-xs rounded-lg transition-all duration-200 flex items-center justify-center font-medium"
+                        style={{
+                          background: extraBg ? `${extraBg}, ${bgColor}` : bgColor,
+                          borderColor: borderColor,
+                          borderWidth: 1,
+                          borderStyle: 'solid',
+                          color: textColor,
+                          boxShadow: shadow || 'none',
+                          cursor: isLocked || isSold ? 'not-allowed' : 'pointer',
+                        }}
+                        title={
+                          isSold
+                            ? `${seat.rowLabel}${seat.seatNumber} - Đã bán`
+                            : isLocked
+                              ? `${seat.rowLabel}${seat.seatNumber} - Có người đang giữ`
+                              : `${seat.rowLabel}${seat.seatNumber} - ${seat.calculatedPrice?.toLocaleString()}₫`
+                        }
+                      >
+                        {seat.seatNumber}
+                      </motion.button>
+                    )
+                  })
+                )}
+
+                <span className="w-5 text-left text-xs text-text-muted ml-1">{row}</span>
+              </div>
+            )
+          })}
         </div>
 
-        {/* Legend */}
+        {/* Status legend */}
         <div className="flex flex-wrap justify-center gap-4 mt-6">
           {[
-            { color: 'bg-white/30 border border-white/20', label: 'Trống' },
-            { color: 'bg-galaxy-pink border border-galaxy-pink/50', label: 'Đang chọn' },
-            { color: 'bg-orange-500/30 border border-orange-500/20', label: 'Đang giữ' },
-            { color: 'bg-red-500/30 border border-red-500/20', label: 'Đã bán' },
+            { bg: 'rgba(59,130,246,0.2)', border: 'rgba(59,130,246,0.4)', label: 'Trống' },
+            { bg: '#ffffff', border: '#ffffff', label: 'Đang chọn', glow: true },
+            { bg: 'rgba(251,146,60,0.35)', border: 'rgba(251,146,60,0.2)', label: 'Đang giữ' },
+            { bg: 'rgba(160,160,160,0.2)', border: 'rgba(160,160,160,0.1)', label: 'Đã bán', crossHatch: true },
           ].map(item => (
             <div key={item.label} className="flex items-center gap-2">
-              <div className={`w-4 h-4 rounded ${item.color}`} />
+              <div
+                className="w-4 h-4 rounded border"
+                style={{
+                  borderColor: item.border,
+                  boxShadow: item.glow ? '0 0 6px rgba(255,255,255,0.4)' : 'none',
+                  background: item.crossHatch
+                    ? 'linear-gradient(135deg, transparent 45%, rgba(160,160,160,0.45) 48%, rgba(160,160,160,0.45) 52%, transparent 55%), linear-gradient(225deg, transparent 45%, rgba(160,160,160,0.45) 48%, rgba(160,160,160,0.45) 52%, transparent 55%) rgba(160,160,160,0.2)'
+                    : item.bg,
+                }}
+              />
               <span className="text-xs text-text-muted">{item.label}</span>
             </div>
           ))}
         </div>
+
+        {/* Seat type legend */}
+        {seatTypes.length > 1 && (
+          <div className="flex flex-wrap justify-center gap-4 mt-3 pt-3 border-t border-white/10">
+            {seatTypes.map(t => (
+              <div key={t.name} className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded" style={{ backgroundColor: t.color }} />
+                <span className="text-xs text-text-muted">{t.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Sticky bottom bar */}

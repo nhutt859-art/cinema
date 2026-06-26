@@ -18,7 +18,6 @@ import AdminRooms from './pages/admin/AdminRooms'
 import AdminShowtimes from './pages/admin/AdminShowtimes'
 import AdminCoupons from './pages/admin/AdminCoupons'
 import AdminCombos from './pages/admin/AdminCombos'
-import AdminStatistics from './pages/admin/AdminStatistics'
 
 export default function App() {
   const { user } = useAuth()
@@ -46,7 +45,6 @@ export default function App() {
           <Route path="showtimes" element={<AdminShowtimes />} />
           <Route path="coupons" element={<AdminCoupons />} />
           <Route path="combos" element={<AdminCombos />} />
-          <Route path="statistics" element={<AdminStatistics />} />
         </Route>
       )}
     </Routes>

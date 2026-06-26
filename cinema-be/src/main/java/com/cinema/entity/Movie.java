@@ -57,6 +57,9 @@ public class Movie {
     @Column(nullable = false)
     private String language;
 
+    @Column(name = "language_display")
+    private String languageDisplay;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AgeRating ageRating;
@@ -66,6 +69,12 @@ public class Movie {
 
     @Column(columnDefinition = "TEXT")
     private String posterUrl;
+
+    @Column
+    private String director;
+
+    @Column(columnDefinition = "TEXT")
+    private String actors;
 
     @Column(nullable = false)
     private LocalDate showingStartDate;
@@ -96,5 +105,8 @@ public class Movie {
     public void prePersist() {
         if (status == null) status = EntityStatus.COMING_SOON;
         if (language == null) language = "Tiếng Việt";
+        if (director == null) director = "Đang cập nhật";
+        if (actors == null) actors = "Đang cập nhật";
+        if (languageDisplay == null) languageDisplay = language != null ? language : "Đang cập nhật";
     }
 }
