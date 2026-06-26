@@ -169,6 +169,46 @@ public class BookingService {
         return toBookingResponse(booking);
     }
 
+    @Transactional
+    public void cancelBooking(UUID bookingId, UserPrincipal principal) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vé không tồn tại"));
+
+        UUID userId = UUID.fromString(principal.getUserId());
+        if (!booking.getUser().getUserId().equals(userId)) {
+            throw new BadRequestException("Vé không thuộc về bạn");
+        }
+
+        if (booking.getBookingStatus() != BookingStatus.PAID) {
+            throw new BadRequestException("Chỉ có thể hủy vé đã thanh toán");
+        }
+
+        BookingSeat bookingSeat = bookingSeatRepository
+                .findByBookingBookingId(bookingId).stream().findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ghế"));
+        LocalDateTime showtimeStart = bookingSeat.getShowtime().getStartTime();
+
+        if (LocalDateTime.now().plusHours(2).isAfter(showtimeStart)) {
+            throw new BadRequestException("Chỉ có thể hủy vé trước giờ chiếu ít nhất 2 tiếng");
+        }
+
+        booking.setBookingStatus(BookingStatus.REFUNDED);
+        bookingRepository.save(booking);
+
+        paymentRepository.findByBookingBookingId(bookingId).ifPresent(payment -> {
+            payment.setPaymentStatus(PaymentStatus.REFUNDED);
+            paymentRepository.save(payment);
+        });
+
+        List<BookingSeat> bookingSeats = bookingSeatRepository
+                .findByBookingBookingId(bookingId);
+        for (BookingSeat bs : bookingSeats) {
+            messagingTemplate.convertAndSend(
+                "/topic/seats/" + bs.getShowtime().getShowtimeId(),
+                bs.getSeat().getSeatId().toString() + ":AVAILABLE");
+        }
+    }
+
     public void cancelExpiredBookings() {
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(15);
         List<Booking> expiredBookings = bookingRepository

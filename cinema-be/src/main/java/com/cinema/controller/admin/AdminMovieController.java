@@ -45,11 +45,19 @@ public class AdminMovieController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Movie> updateMovie(@PathVariable UUID id, @RequestBody Movie movie) {
+    public ResponseEntity<Movie> updateMovie(@PathVariable UUID id, @RequestBody Movie request) {
         Movie existing = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found"));
-        movie.setMovieId(existing.getMovieId());
-        return ResponseEntity.ok(movieRepository.save(movie));
+        if (request.getTitle() != null) existing.setTitle(request.getTitle());
+        if (request.getDescription() != null) existing.setDescription(request.getDescription());
+        if (request.getDuration() != null) existing.setDuration(request.getDuration());
+        if (request.getLanguage() != null) existing.setLanguage(request.getLanguage());
+        if (request.getAgeRating() != null) existing.setAgeRating(request.getAgeRating());
+        if (request.getTrailerUrl() != null) existing.setTrailerUrl(request.getTrailerUrl());
+        if (request.getPosterUrl() != null) existing.setPosterUrl(request.getPosterUrl());
+        if (request.getShowingStartDate() != null) existing.setShowingStartDate(request.getShowingStartDate());
+        if (request.getShowingEndDate() != null) existing.setShowingEndDate(request.getShowingEndDate());
+        return ResponseEntity.ok(movieRepository.save(existing));
     }
 
     @DeleteMapping("/{id}")

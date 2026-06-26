@@ -8,6 +8,7 @@ const bookingApi = {
   getUserBookings: (params) => axiosClient.get('/bookings', { params }),
   getBookingDetail: (id) => axiosClient.get(`/bookings/${id}`),
   getShowtimesByMovie: (movieId) => axiosClient.get(`/showtimes/movie/${movieId}`),
+  cancelBooking: (id) => axiosClient.put(`/bookings/${id}/cancel`),
 }
 
 export default bookingApi

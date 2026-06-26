@@ -1,6 +1,9 @@
 package com.cinema.dto.request;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,5 +14,6 @@ public class ApplyCouponRequest {
     @NotBlank
     private String code;
 
-    private java.math.BigDecimal orderAmount;
+    @NotNull(message = "Order amount is required")
+    private BigDecimal orderAmount;
 }

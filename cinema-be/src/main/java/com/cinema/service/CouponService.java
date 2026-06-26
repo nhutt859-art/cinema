@@ -20,6 +20,9 @@ public class CouponService {
     private final CouponRepository couponRepository;
 
     public CouponResponse applyCoupon(String code, BigDecimal orderAmount) {
+        if (code == null || orderAmount == null) {
+            throw new BadRequestException("Mã giảm giá hoặc số tiền không hợp lệ");
+        }
         Coupon coupon = couponRepository.findActiveCouponByCode(code)
                 .orElseThrow(() -> new BadRequestException("Invalid or expired coupon code"));
 
@@ -32,9 +35,6 @@ public class CouponService {
         if (coupon.getDiscountType() == DiscountType.PERCENTAGE) {
             discountedAmount = orderAmount.multiply(coupon.getDiscountValue())
                     .divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
-            if (discountedAmount.compareTo(coupon.getDiscountValue().multiply(BigDecimal.valueOf(100))) > 0) {
-                discountedAmount = coupon.getDiscountValue();
-            }
         } else {
             discountedAmount = coupon.getDiscountValue();
         }

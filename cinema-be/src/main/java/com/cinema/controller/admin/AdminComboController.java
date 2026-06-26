@@ -30,7 +30,7 @@ public class AdminComboController {
 
     @GetMapping
     public ResponseEntity<Page<Combo>> getAllCombos(Pageable pageable) {
-        return ResponseEntity.ok(comboRepository.findAll(pageable));
+        return ResponseEntity.ok(comboRepository.findByStatus(EntityStatus.ACTIVE, pageable));
     }
 
     @PostMapping
@@ -39,9 +39,14 @@ public class AdminComboController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Combo> updateCombo(@PathVariable UUID id, @RequestBody Combo combo) {
-        combo.setComboId(id);
-        return ResponseEntity.ok(comboRepository.save(combo));
+    public ResponseEntity<Combo> updateCombo(@PathVariable UUID id, @RequestBody Combo request) {
+        Combo existing = comboRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Combo not found"));
+        if (request.getComboName() != null) existing.setComboName(request.getComboName());
+        if (request.getDescription() != null) existing.setDescription(request.getDescription());
+        if (request.getPrice() != null) existing.setPrice(request.getPrice());
+        if (request.getImageUrl() != null) existing.setImageUrl(request.getImageUrl());
+        return ResponseEntity.ok(comboRepository.save(existing));
     }
 
     @DeleteMapping("/{id}")

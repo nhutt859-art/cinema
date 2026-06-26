@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cinema.dto.request.ChangePasswordRequest;
 import com.cinema.dto.request.ForgotPasswordRequest;
 import com.cinema.dto.request.LoginRequest;
 import com.cinema.dto.request.RegisterRequest;
@@ -52,15 +53,23 @@ public class AuthController {
         return ResponseEntity.ok(authService.updateProfile(principal, request));
     }
 
+    @PutMapping("/change-password")
+    public ResponseEntity<Map<String, String>> changePassword(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(principal, request);
+        return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công"));
+    }
+
     @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         authService.forgotPassword(request);
-        return ResponseEntity.ok(Map.of("message", "Ma xac nhan da gui den email cua ban"));
+        return ResponseEntity.ok(Map.of("message", "Mã xác nhận đã gửi đến email của bạn"));
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
-        return ResponseEntity.ok(Map.of("message", "Dat lai mat khau thanh cong"));
+        return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công"));
     }
 }

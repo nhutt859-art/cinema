@@ -21,18 +21,21 @@ export function AuthProvider({ children }) {
     const res = await authApi.login({ email, password })
     const data = res.data
     localStorage.setItem('accessToken', data.accessToken)
-    localStorage.setItem('user', JSON.stringify({
+
+    const profileRes = await authApi.getProfile()
+    const profile = profileRes.data
+    const userData = {
       userId: data.userId,
       fullName: data.fullName,
       email: data.email,
       role: data.role,
-    }))
-    setUser({
-      userId: data.userId,
-      fullName: data.fullName,
-      email: data.email,
-      role: data.role,
-    })
+      phone: profile.phone,
+      gender: profile.gender,
+      dateOfBirth: profile.dateOfBirth,
+      avatar: profile.avatar,
+    }
+    localStorage.setItem('user', JSON.stringify(userData))
+    setUser(userData)
     return data
   }
 

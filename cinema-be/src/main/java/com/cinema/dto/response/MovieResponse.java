@@ -20,9 +20,12 @@ public class MovieResponse {
     private String description;
     private Integer duration;
     private String language;
+    private String languageDisplay;
     private String ageRating;
     private String trailerUrl;
     private String posterUrl;
+    private String director;
+    private String actors;
     private LocalDate showingStartDate;
     private LocalDate showingEndDate;
     private String status;

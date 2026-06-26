@@ -1,5 +1,6 @@
 package com.cinema.controller;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,5 +49,13 @@ public class BookingController {
             @PathVariable UUID id,
             @AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(bookingService.getBookingDetail(id, principal));
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<Map<String, String>> cancelBooking(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        bookingService.cancelBooking(id, principal);
+        return ResponseEntity.ok(Map.of("message", "Hủy vé thành công, tiền sẽ được hoàn lại"));
     }
 }

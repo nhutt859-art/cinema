@@ -30,7 +30,7 @@ public class AdminCouponController {
 
     @GetMapping
     public ResponseEntity<Page<Coupon>> getAllCoupons(Pageable pageable) {
-        return ResponseEntity.ok(couponRepository.findAll(pageable));
+        return ResponseEntity.ok(couponRepository.findByStatus(EntityStatus.ACTIVE, pageable));
     }
 
     @PostMapping
@@ -39,11 +39,16 @@ public class AdminCouponController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Coupon> updateCoupon(@PathVariable UUID id, @RequestBody Coupon coupon) {
+    public ResponseEntity<Coupon> updateCoupon(@PathVariable UUID id, @RequestBody Coupon request) {
         Coupon existing = couponRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Coupon not found"));
-        coupon.setCouponId(existing.getCouponId());
-        return ResponseEntity.ok(couponRepository.save(coupon));
+        if (request.getCode() != null) existing.setCode(request.getCode());
+        if (request.getDiscountType() != null) existing.setDiscountType(request.getDiscountType());
+        if (request.getDiscountValue() != null) existing.setDiscountValue(request.getDiscountValue());
+        if (request.getQuantity() != null) existing.setQuantity(request.getQuantity());
+        if (request.getMinOrderValue() != null) existing.setMinOrderValue(request.getMinOrderValue());
+        if (request.getExpiredAt() != null) existing.setExpiredAt(request.getExpiredAt());
+        return ResponseEntity.ok(couponRepository.save(existing));
     }
 
     @DeleteMapping("/{id}")

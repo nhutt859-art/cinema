@@ -2,10 +2,11 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Minus, Plus, Ticket, ShoppingBag, CreditCard, Clock, CheckCircle } from 'lucide-react'
+import { ChevronRight, Minus, Plus, Ticket, ShoppingBag, CreditCard, Clock, CheckCircle, AlertCircle } from 'lucide-react'
 import bookingApi from '../api/bookingApi'
 import paymentApi from '../api/paymentApi'
 import comboApi from '../api/comboApi'
+import couponApi from '../api/couponApi'
 import Button from '../components/ui/Button'
 import Loading from '../components/ui/Loading'
 
@@ -38,6 +39,38 @@ export default function Checkout() {
     queryFn: () => comboApi.getCombos().then(r => r.data),
   })
 
+  const [checkingCoupon, setCheckingCoupon] = useState(false)
+  const [couponResult, setCouponResult] = useState(null)
+
+  const handleCheckCoupon = async () => {
+    if (!couponCode) return
+    setCheckingCoupon(true)
+    setCouponResult(null)
+    try {
+      const rawTotal = seatTotal + comboTotal
+      if (rawTotal <= 0) {
+        setCouponResult({ valid: false, error: 'Chưa có sản phẩm trong giỏ hàng' })
+        return
+      }
+      const res = await couponApi.applyCoupon({ code: couponCode, orderAmount: rawTotal })
+      const data = res.data
+      setCouponResult({
+        valid: true,
+        discountText: data.discountType === 'PERCENTAGE'
+          ? `${data.discountValue}% (giảm ${data.discountedAmount.toLocaleString()}₫)`
+          : `${data.discountedAmount.toLocaleString()}₫`,
+        discountedAmount: data.discountedAmount,
+      })
+    } catch (err) {
+      setCouponResult({
+        valid: false,
+        error: err.response?.data?.error || 'Mã giảm giá không hợp lệ',
+      })
+    } finally {
+      setCheckingCoupon(false)
+    }
+  }
+
   useEffect(() => {
     if (combos) {
       const initial = {}
@@ -54,12 +87,13 @@ export default function Checkout() {
   const seatTotal = seats.reduce((sum, s) => sum + s.calculatedPrice, 0)
   const comboTotal = combos ? combos.reduce((sum, c) => sum + c.price * (comboQtys[c.comboId] || 0), 0) : 0
   const totalAmount = seatTotal + comboTotal
+  const displayTotal = couponResult?.valid ? totalAmount - couponResult.discountedAmount : totalAmount
   const selectedCombos = combos ? combos.filter(c => comboQtys[c.comboId] > 0).map(c => ({ comboId: c.comboId, quantity: comboQtys[c.comboId] })) : []
 
   const vietQrUrl = useMemo(() => {
-    if (!bookingId || !totalAmount) return ''
+    if (!bookingId || !displayTotal) return ''
     const content = `CINEMA${bookingId.substring(0, 8).toUpperCase()}`
-    return `https://img.vietqr.io/image/${bankInfo.bankCode}-${bankInfo.accountNumber}-compact.png?amount=${Math.round(totalAmount)}&addInfo=${encodeURIComponent(content)}&accountName=${encodeURIComponent(bankInfo.accountHolder)}`
+    return `https://img.vietqr.io/image/${bankInfo.bankCode}-${bankInfo.accountNumber}-compact.png?amount=${Math.round(displayTotal)}&addInfo=${encodeURIComponent(content)}&accountName=${encodeURIComponent(bankInfo.accountHolder)}`
   }, [bookingId, totalAmount])
 
   const stopPolling = useCallback(() => {
@@ -114,7 +148,7 @@ export default function Checkout() {
   if (step === 'payment') {
     const content = `CINEMA${bookingId?.substring(0, 8).toUpperCase()}`
     return (
-      <div className="max-w-lg mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-8 space-y-6">
           <div className="text-center">
             <div className="w-16 h-16 rounded-full bg-button-glow flex items-center justify-center mx-auto mb-3">
@@ -200,10 +234,15 @@ export default function Checkout() {
           <div className="space-y-3">
             {combos.map(combo => (
               <div key={combo.comboId} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                <div>
-                  <p className="font-medium text-sm">{combo.comboName}</p>
-                  <p className="text-xs text-text-muted">{combo.description}</p>
-                  <p className="text-sm text-galaxy-cyan font-semibold">{combo.price.toLocaleString()}₫</p>
+                <div className="flex items-center gap-3">
+                  {combo.imageUrl && (
+                    <img src={combo.imageUrl} alt={combo.comboName} className="w-12 h-12 rounded-lg object-cover shrink-0" />
+                  )}
+                  <div>
+                    <p className="font-medium text-sm">{combo.comboName}</p>
+                    <p className="text-xs text-text-muted">{combo.description}</p>
+                    <p className="text-sm text-galaxy-cyan font-semibold">{combo.price.toLocaleString()}₫</p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => setComboQtys(prev => ({ ...prev, [combo.comboId]: Math.max(0, (prev[combo.comboId] || 0) - 1) }))} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all"><Minus size={14} /></button>
@@ -219,16 +258,39 @@ export default function Checkout() {
       {/* Coupon */}
       <div className="glass-card p-6 mb-4">
         <h2 className="font-semibold mb-3">Mã giảm giá</h2>
-        <input type="text" value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} placeholder="Nhập mã giảm giá..." className="input-field" />
+        <div className="flex gap-2">
+          <input type="text" value={couponCode}
+            onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponResult(null) }}
+            placeholder="Nhập mã giảm giá..." className="input-field flex-1" />
+          <Button onClick={handleCheckCoupon} disabled={!couponCode || checkingCoupon}
+            className="shrink-0 px-4 text-sm">
+            {checkingCoupon ? 'Đang kiểm tra...' : 'Xác nhận'}
+          </Button>
+        </div>
+        {couponResult && (
+          <div className="mt-3 text-sm flex items-center gap-2">
+            {couponResult.valid ? (
+              <>
+                <CheckCircle size={14} className="text-green-400 shrink-0" />
+                <span className="text-green-400">Giảm {couponResult.discountText}</span>
+              </>
+            ) : (
+              <>
+                <AlertCircle size={14} className="text-red-400 shrink-0" />
+                <span className="text-red-400">{couponResult.error}</span>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Total */}
       <div className="glass-card p-6 mb-6 space-y-2">
         <div className="flex justify-between"><span className="text-text-secondary">Tiền ghế</span><span>{seatTotal.toLocaleString()}₫</span></div>
         {comboTotal > 0 && <div className="flex justify-between"><span className="text-text-secondary">Bắp nước</span><span>{comboTotal.toLocaleString()}₫</span></div>}
-        {couponCode && <div className="flex justify-between text-green-400 text-sm"><span>Giảm giá</span><span>(áp dụng khi thanh toán)</span></div>}
+        {couponResult?.valid && <div className="flex justify-between text-green-400 text-sm"><span>Giảm giá</span><span>-{couponResult.discountText}</span></div>}
         <hr className="border-white/10" />
-        <div className="flex justify-between text-xl font-bold"><span>Tổng cộng</span><span className="galaxy-text-gradient">{totalAmount.toLocaleString()}₫</span></div>
+        <div className="flex justify-between text-xl font-bold"><span>Tổng cộng</span><span className="galaxy-text-gradient">{displayTotal.toLocaleString()}₫</span></div>
       </div>
 
       <Button onClick={handleCreateBooking} disabled={loading} className="w-full flex items-center justify-center gap-2 text-lg py-4">

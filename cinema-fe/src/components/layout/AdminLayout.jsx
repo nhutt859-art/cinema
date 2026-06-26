@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LayoutDashboard, Film, Home, Clock, Ticket, Popcorn, BarChart3,
+  LayoutDashboard, Film, Home, Clock, Ticket, Popcorn,
   ChevronLeft, ChevronRight, LogOut, ExternalLink, Star
 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
@@ -15,7 +15,6 @@ const sidebarItems = [
   { path: '/admin/showtimes', icon: Clock, label: 'Suất chiếu' },
   { path: '/admin/coupons', icon: Ticket, label: 'Mã giảm giá' },
   { path: '/admin/combos', icon: Popcorn, label: 'Combo' },
-  { path: '/admin/statistics', icon: BarChart3, label: 'Thống kê' },
 ]
 
 export default function AdminLayout() {

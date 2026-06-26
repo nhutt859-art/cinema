@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,6 +18,10 @@ import com.cinema.enums.EntityStatus;
 
 @Repository
 public interface ShowtimeRepository extends JpaRepository<Showtime, UUID> {
+
+    Page<Showtime> findByStartTimeGreaterThanEqual(LocalDateTime dateTime, Pageable pageable);
+
+    Page<Showtime> findByStartTimeGreaterThanEqualAndStatusNot(LocalDateTime dateTime, EntityStatus status, Pageable pageable);
 
     List<Showtime> findByMovieMovieIdAndStatusOrderByStartTimeAsc(UUID movieId, EntityStatus status);
 
@@ -28,4 +35,12 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, UUID> {
 
     @Query("SELECT s FROM Showtime s WHERE s.showtimeId = :id AND s.status = 'ACTIVE'")
     Optional<Showtime> findActiveById(@Param("id") UUID showtimeId);
+
+    boolean existsByRoomRoomIdAndStatus(UUID roomId, EntityStatus status);
+
+    boolean existsByRoomRoomId(UUID roomId);
+
+    @Modifying
+    @Query("DELETE FROM Showtime s WHERE s.room.roomId = :roomId")
+    void deleteByRoomRoomId(@Param("roomId") UUID roomId);
 }

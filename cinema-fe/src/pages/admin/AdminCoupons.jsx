@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Plus, Trash2, Ticket } from 'lucide-react'
+import { Plus, Pencil, Trash2, Ticket } from 'lucide-react'
 import adminApi from '../../api/adminApi'
 import Button from '../../components/ui/Button'
 import Modal from '../../components/ui/Modal'
@@ -10,7 +10,9 @@ import Loading from '../../components/ui/Loading'
 export default function AdminCoupons() {
   const queryClient = useQueryClient()
   const [showForm, setShowForm] = useState(false)
+  const [editingCoupon, setEditingCoupon] = useState(null)
   const [form, setForm] = useState({ code: '', discountType: 'PERCENTAGE', discountValue: 10, quantity: 100, minOrderValue: 0, expiredAt: '' })
+  const [formError, setFormError] = useState('')
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'coupons'],
@@ -19,17 +21,55 @@ export default function AdminCoupons() {
 
   const coupons = data?.content || data || []
 
+  const resetForm = () => {
+    setForm({ code: '', discountType: 'PERCENTAGE', discountValue: 10, quantity: 100, minOrderValue: 0, expiredAt: '' })
+    setEditingCoupon(null)
+    setFormError('')
+  }
+
+  const handleEdit = (coupon) => {
+    setForm({
+      code: coupon.code,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      quantity: coupon.quantity,
+      minOrderValue: coupon.minOrderValue,
+      expiredAt: coupon.expiredAt ? coupon.expiredAt.substring(0, 10) : '',
+    })
+    setEditingCoupon(coupon)
+    setShowForm(true)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await adminApi.createCoupon(form)
-    queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] })
-    setShowForm(false)
+    setFormError('')
+    const payload = {
+      ...form,
+      expiredAt: form.expiredAt ? form.expiredAt + 'T23:59:59' : null,
+      minOrderValue: Number(form.minOrderValue),
+    }
+    try {
+      if (editingCoupon) {
+        await adminApi.updateCoupon(editingCoupon.couponId, payload)
+      } else {
+        await adminApi.createCoupon(payload)
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] })
+      setShowForm(false)
+      resetForm()
+    } catch (err) {
+      setFormError(err.response?.data?.error || 'Thao tác thất bại')
+    }
   }
 
   const handleDelete = async (id) => {
     if (!window.confirm('Xóa mã giảm giá này?')) return
-    await adminApi.deleteCoupon(id)
-    queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] })
+    try {
+      await adminApi.deleteCoupon(id)
+      queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] })
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   if (isLoading) return <Loading />
@@ -38,11 +78,12 @@ export default function AdminCoupons() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold flex items-center gap-2"><Ticket size={24} className="text-galaxy-cyan" /> Mã giảm giá</h1>
-        <Button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2"><Plus size={16} /> Thêm mã</Button>
+        <Button onClick={() => { resetForm(); setShowForm(true) }} className="flex items-center gap-2"><Plus size={16} /> Thêm mã</Button>
       </div>
 
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title="Thêm mã giảm giá">
+      <Modal isOpen={showForm} onClose={() => { setShowForm(false); resetForm() }} title={editingCoupon ? 'Sửa mã giảm giá' : 'Thêm mã giảm giá'}>
         <form onSubmit={handleSubmit} className="space-y-3">
+          {formError && <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm text-center">{formError}</div>}
           <div><label className="text-sm text-text-secondary">Mã code</label><input type="text" value={form.code} onChange={(e) => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} className="input-field mt-1" required /></div>
           <div>
             <label className="text-sm text-text-secondary">Loại</label>
@@ -59,7 +100,7 @@ export default function AdminCoupons() {
             <div><label className="text-sm text-text-secondary">Đơn tối thiểu</label><input type="number" value={form.minOrderValue} onChange={(e) => setForm(p => ({ ...p, minOrderValue: +e.target.value }))} className="input-field mt-1" /></div>
             <div><label className="text-sm text-text-secondary">Hết hạn</label><input type="date" value={form.expiredAt} onChange={(e) => setForm(p => ({ ...p, expiredAt: e.target.value }))} className="input-field mt-1" /></div>
           </div>
-          <Button type="submit" className="w-full">Lưu</Button>
+          <Button type="submit" className="w-full">{editingCoupon ? 'Cập nhật' : 'Lưu'}</Button>
         </form>
       </Modal>
 
@@ -83,7 +124,8 @@ export default function AdminCoupons() {
                 <td className="p-4">{c.discountType === 'PERCENTAGE' ? `${c.discountValue}%` : `${c.discountValue?.toLocaleString()}₫`}</td>
                 <td className="p-4 hidden md:table-cell">{c.quantity}</td>
                 <td className="p-4 hidden lg:table-cell text-text-muted">{c.expiredAt ? new Date(c.expiredAt).toLocaleDateString('vi-VN') : '-'}</td>
-                <td className="p-4 text-right">
+                <td className="p-4 text-right flex items-center justify-end gap-2">
+                  <button onClick={() => handleEdit(c)} className="text-text-muted hover:text-white transition-colors"><Pencil size={16} /></button>
                   <button onClick={() => handleDelete(c.couponId)} className="text-red-400 hover:text-red-300 transition-colors"><Trash2 size={16} /></button>
                 </td>
               </motion.tr>
