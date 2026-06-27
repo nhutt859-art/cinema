@@ -6,9 +6,9 @@ spring:
     name: cinema-be
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/cinema_db
-    username: postgres
-    password: 20040608Tm.n
+    url: jdbc:postgresql://ep-shy-mouse-aovpduzv.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_7Cgx5pasXwet
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -57,6 +57,11 @@ spring:
         transport:
           protocol: smtp
 
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -86,6 +91,7 @@ app:
     access-token-expiration: 3600000
     refresh-token-expiration: 604800000
   redis:
+    enabled: false
     seat-lock-ttl: 900
     max-seats-per-booking: 8
   cors:
