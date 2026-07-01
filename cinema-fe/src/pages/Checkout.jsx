@@ -39,7 +39,7 @@ export default function Checkout() {
   })
 
   useEffect(() => {
-    if (combos) {
+    if (Array.isArray(combos)) {
       const initial = {}
       combos.forEach(c => { initial[c.comboId] = 0 })
       setComboQtys(initial)
@@ -51,10 +51,10 @@ export default function Checkout() {
     return null
   }
 
-  const seatTotal = seats.reduce((sum, s) => sum + s.calculatedPrice, 0)
-  const comboTotal = combos ? combos.reduce((sum, c) => sum + c.price * (comboQtys[c.comboId] || 0), 0) : 0
+  const seatTotal = Array.isArray(seats) ? seats.reduce((sum, s) => sum + s.calculatedPrice, 0) : 0
+  const comboTotal = Array.isArray(combos) ? combos.reduce((sum, c) => sum + c.price * (comboQtys[c.comboId] || 0), 0) : 0
   const totalAmount = seatTotal + comboTotal
-  const selectedCombos = combos ? combos.filter(c => comboQtys[c.comboId] > 0).map(c => ({ comboId: c.comboId, quantity: comboQtys[c.comboId] })) : []
+  const selectedCombos = Array.isArray(combos) ? combos.filter(c => comboQtys[c.comboId] > 0).map(c => ({ comboId: c.comboId, quantity: comboQtys[c.comboId] })) : []
 
   const vietQrUrl = useMemo(() => {
     if (!bookingId || !totalAmount) return ''
@@ -94,7 +94,7 @@ export default function Checkout() {
     setLoading(true)
     setError('')
     try {
-      const res = await bookingApi.createBooking({ showtimeId, seatIds: seats.map(s => s.seatId), combos: selectedCombos.length > 0 ? selectedCombos : null, couponCode: couponCode || null })
+      const res = await bookingApi.createBooking({ showtimeId, seatIds: Array.isArray(seats) ? seats.map(s => s.seatId) : [], combos: selectedCombos.length > 0 ? selectedCombos : null, couponCode: couponCode || null })
       const id = res.data.bookingId
       setBookingId(id)
       await paymentApi.initiateBankPayment(id)
@@ -183,7 +183,7 @@ export default function Checkout() {
       <div className="glass-card p-6 mb-4 space-y-3">
         <h2 className="font-semibold flex items-center gap-2"><Ticket size={16} className="text-galaxy-pink" /> Ghế đã chọn</h2>
         <div className="flex flex-wrap gap-2">
-          {seats.map(seat => (
+          {Array.isArray(seats) && seats.map(seat => (
             <span key={seat.seatId} className="bg-galaxy-purple/20 text-galaxy-purple border border-galaxy-purple/30 px-3 py-1 rounded-full text-sm">
               {seat.rowLabel}{seat.seatNumber} — {seat.calculatedPrice?.toLocaleString()}₫
             </span>
@@ -194,7 +194,7 @@ export default function Checkout() {
       {/* Combos */}
       <div className="glass-card p-6 mb-4">
         <h2 className="font-semibold mb-4 flex items-center gap-2"><ShoppingBag size={16} className="text-galaxy-pink" /> Bắp nước</h2>
-        {!combos ? (
+        {!Array.isArray(combos) ? (
           <Loading text="Đang tải..." />
         ) : (
           <div className="space-y-3">

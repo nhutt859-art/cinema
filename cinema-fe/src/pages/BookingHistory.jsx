@@ -13,7 +13,7 @@ export default function BookingHistory() {
     queryFn: () => bookingApi.getUserBookings({ page: 0, size: 20 }).then(r => r.data),
   })
 
-  const bookings = data?.content || data || []
+  const bookings = Array.isArray(data?.content) ? data.content : (Array.isArray(data) ? data : [])
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -46,9 +46,9 @@ export default function BookingHistory() {
                   <h3 className="font-semibold">{booking.movieTitle}</h3>
                   <p className="text-xs text-text-muted">{new Date(booking.showtimeStart).toLocaleDateString('vi-VN')} — {booking.roomName}</p>
                   <p className="text-sm text-text-secondary flex items-center gap-1">
-                    <Ticket size={14} /> Ghế: {booking.seatLabels?.join(', ')}
+                    <Ticket size={14} /> Ghế: {Array.isArray(booking.seatLabels) ? booking.seatLabels.join(', ') : ''}
                   </p>
-                  {booking.combos?.length > 0 && (
+                  {Array.isArray(booking.combos) && booking.combos.length > 0 && (
                     <p className="text-xs text-text-muted">Combo: {booking.combos.map(c => `${c.comboName} x${c.quantity}`).join(', ')}</p>
                   )}
                 </div>

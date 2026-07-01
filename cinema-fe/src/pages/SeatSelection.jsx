@@ -67,7 +67,7 @@ export default function SeatSelection() {
   }
 
   if (isLoading) return <Loading />
-  if (!seats) return null
+  if (!Array.isArray(seats)) return null
 
   const rows = [...new Set(seats.map(s => s.rowLabel))].sort()
   const total = selectedSeats.reduce((sum, s) => sum + s.calculatedPrice, 0)

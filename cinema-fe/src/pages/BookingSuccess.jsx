@@ -68,7 +68,7 @@ export default function BookingSuccess() {
   }
 
   const isPaid = booking?.bookingStatus === 'PAID'
-  const comboText = booking?.combos?.map(c => `${c.comboName} x${c.quantity}`).join(', ') || ''
+  const comboText = Array.isArray(booking?.combos) ? booking.combos.map(c => `${c.comboName} x${c.quantity}`).join(', ') : ''
   const endTime = booking?.showtimeStart
     ? new Date(new Date(booking.showtimeStart).getTime() + 120 * 60000).toISOString()
     : ''
@@ -120,7 +120,7 @@ export default function BookingSuccess() {
               <div>
                 <span className="text-xs text-text-muted block mb-2">Ghế:</span>
                 <div className="flex flex-wrap gap-2">
-                  {booking.seatLabels?.map(seat => (
+                  {Array.isArray(booking.seatLabels) && booking.seatLabels.map(seat => (
                     <span key={seat} className="bg-galaxy-purple/20 text-galaxy-purple border border-galaxy-purple/30 px-3 py-1 rounded-full text-sm font-semibold">
                       {seat}
                     </span>

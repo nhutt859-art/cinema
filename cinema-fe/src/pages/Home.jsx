@@ -22,7 +22,7 @@ export default function Home() {
   const [heroMovie, setHeroMovie] = useState(null)
 
   useEffect(() => {
-    movieApi.getGenres().then(r => setGenres(r.data)).catch(() => {})
+    movieApi.getGenres().then(r => setGenres(Array.isArray(r.data) ? r.data : [])).catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -125,7 +125,7 @@ export default function Home() {
         </div>
 
         {/* Genre filters */}
-        {genres.length > 0 && (
+        {Array.isArray(genres) && genres.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {genres.map((genre) => (
               <button
@@ -201,7 +201,7 @@ export default function Home() {
                         <Clock size={12} />
                         <span>{movie.duration} phút</span>
                       </div>
-                      {movie.genres && (
+                      {Array.isArray(movie.genres) && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {movie.genres.slice(0, 2).map(g => (
                             <span key={g.genreId || g} className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-text-muted">

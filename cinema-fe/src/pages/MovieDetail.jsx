@@ -74,7 +74,7 @@ export default function MovieDetail() {
         >
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={movie.ageRating}>{movie.ageRating}</Badge>
-            {movie.genres?.map(g => (
+            {Array.isArray(movie.genres) && movie.genres.map(g => (
               <Badge key={g.genreId || g} variant="ACTIVE" className="!bg-galaxy-purple/20 !text-galaxy-purple !border-galaxy-purple/30">{g.name || g}</Badge>
             ))}
           </div>
