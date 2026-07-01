@@ -95,7 +95,7 @@ app:
     seat-lock-ttl: 900
     max-seats-per-booking: 8
   cors:
-    allowed-origins: http://localhost:5173,http://localhost:3000,https://cinema-orpin-nine.vercel.app
+    allowed-origins: http://localhost:5173,http://localhost:3000,https://cinema-6ka7.vercel.app
 
 logging:
   level:
