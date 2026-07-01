@@ -30,7 +30,7 @@ export default function Home() {
     const fetch = activeTab === 'now-showing' ? movieApi.getNowShowing() : movieApi.getComingSoon()
     fetch
       .then(r => {
-        const data = r.data?.content || r.data || []
+        const data = Array.isArray(r.data?.content) ? r.data.content : (Array.isArray(r.data) ? r.data : [])
         setMovies(data)
         if (data.length > 0 && activeTab === 'now-showing') setHeroMovie(data[0])
       })
