@@ -6,7 +6,7 @@ spring:
     name: cinema-be
 
   datasource:
-    url: jdbc:postgresql://ep-shy-mouse-aovpduzv.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+    url: jdbc:postgresql://ep-shy-mouse-aovpduzv.c-2.ap-southeast-1.aws.neon.tech/celestia?sslmode=require
     username: neondb_owner
     password: npg_7Cgx5pasXwet
     driver-class-name: org.postgresql.Driver

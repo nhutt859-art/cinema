@@ -1,4 +1,4 @@
-﻿-- Auto-generated showtimes
+-- Auto-generated showtimes
 -- Generated: 2026-06-21 22:08:48
 
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
@@ -146,24 +146,6 @@ INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, bas
     ('27c6e0ad-5f6a-4248-b8a9-bdd4126607ad', '3d45a13b-4e01-4877-a01b-31753c133696', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-27 15:00:00+07', '2026-06-27 16:59:00+07', 75000, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('2866ea73-1ecc-47c6-a0d6-84c525368885', '32ae186d-c27d-4b99-bf5b-5c3e7af16175', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-21 15:00:00+07', '2026-06-21 16:52:00+07', 75000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('ca6c1126-2020-4301-9f02-4e818f2bde8c', '32ae186d-c27d-4b99-bf5b-5c3e7af16175', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-07-04 10:00:00+07', '2026-07-04 11:51:00+07', 65000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('72354ad5-0d2d-44f2-aa2d-3f669cf06d03', '32ae186d-c27d-4b99-bf5b-5c3e7af16175', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-21 20:00:00+07', '2026-06-21 21:20:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('60e287a2-213a-4690-a5a4-9b948cce6f61', '3b1281d4-3393-497d-86fa-44d4124b494c', '0187604c-6937-4781-97e0-4370286e57b4', '2026-07-02 19:00:00+07', '2026-07-02 20:25:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('6e73d827-e236-4cc4-a12e-7fb2f634b7a7', '3b1281d4-3393-497d-86fa-44d4124b494c', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-27 20:00:00+07', '2026-06-27 21:34:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('020e8a81-2e3c-4cb0-83d0-de3505c7df1b', '3b1281d4-3393-497d-86fa-44d4124b494c', '0187604c-6937-4781-97e0-4370286e57b4', '2026-06-27 16:00:00+07', '2026-06-27 17:30:00+07', 75000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
     ('90a44754-2f3f-47aa-93ae-8f03776ef5d5', '5775cd1f-6b63-414a-be70-cfde1fc75458', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-21 10:00:00+07', '2026-06-21 11:57:00+07', 65000, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
@@ -171,15 +153,6 @@ INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, bas
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
     ('cb7c7686-b2f8-40c2-b5e7-8818953a71b9', '5775cd1f-6b63-414a-be70-cfde1fc75458', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-23 18:00:00+07', '2026-06-23 19:37:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('24e3fa66-0f9d-4469-b808-cdcbba49ef7f', '36daeaea-f554-41e7-87c2-648e28e4ee7e', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-07-02 10:00:00+07', '2026-07-02 11:27:00+07', 65000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('c81ff2c8-b095-41f7-a39a-f58b9a47d9df', '36daeaea-f554-41e7-87c2-648e28e4ee7e', '0187604c-6937-4781-97e0-4370286e57b4', '2026-06-23 19:00:00+07', '2026-06-23 20:36:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('b1e8d83f-7954-4d34-b9ea-50551f9dc2e5', '36daeaea-f554-41e7-87c2-648e28e4ee7e', '0187604c-6937-4781-97e0-4370286e57b4', '2026-06-27 19:00:00+07', '2026-06-27 20:22:00+07', 85000, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
     ('360595f4-d7e8-40bc-aeac-998e45d516e6', 'bb973944-b424-4fe9-b353-94e0b234836b', '0187604c-6937-4781-97e0-4370286e57b4', '2026-06-25 21:00:00+07', '2026-06-25 22:37:00+07', 85000, 'ACTIVE')
@@ -200,15 +173,6 @@ INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, bas
     ('8a019b19-fe5f-4d7b-8347-8c0c49e175a4', 'a73f8408-e93a-4fc2-b621-96937d345a73', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-21 18:00:00+07', '2026-06-21 19:59:00+07', 85000, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('285fc226-45c1-4135-b120-861b857b6e00', '3a721c1f-55a1-4b5e-ac1b-f08cc08ae325', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-22 13:00:00+07', '2026-06-22 14:24:00+07', 75000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('5dd90b45-1f56-48b1-ba83-444d3cfdbd98', '3a721c1f-55a1-4b5e-ac1b-f08cc08ae325', '0187604c-6937-4781-97e0-4370286e57b4', '2026-07-03 21:00:00+07', '2026-07-03 22:39:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('a0b7eb28-af18-4366-85a9-bf010f89df7e', '3a721c1f-55a1-4b5e-ac1b-f08cc08ae325', '0187604c-6937-4781-97e0-4370286e57b4', '2026-07-04 19:00:00+07', '2026-07-04 20:32:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
     ('eaf9802d-f0b9-47d2-bee0-290b08c0aae7', '93e807d2-bc34-475a-9eec-e6c161f42ec0', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-26 13:00:00+07', '2026-06-26 14:36:00+07', 75000, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
@@ -225,15 +189,6 @@ INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, bas
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
     ('1edc72d3-ebd4-4529-b398-7e5af85cd8c2', '9392be38-4337-407a-ac8c-305d257de7b6', '0187604c-6937-4781-97e0-4370286e57b4', '2026-07-04 21:00:00+07', '2026-07-04 22:23:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('a20c35b4-7e31-4059-aef7-138c34600ebe', 'baf283aa-0a8f-4135-9a7d-da261a9542b8', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-30 20:00:00+07', '2026-06-30 21:54:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('cfb3003e-9a93-43fd-8c7e-3ab7b902d9ee', 'baf283aa-0a8f-4135-9a7d-da261a9542b8', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-07-04 08:00:00+07', '2026-07-04 09:54:00+07', 65000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('1ed43851-5bce-46e5-9feb-266c1c2650ee', 'baf283aa-0a8f-4135-9a7d-da261a9542b8', '0187604c-6937-4781-97e0-4370286e57b4', '2026-06-21 11:00:00+07', '2026-06-21 12:50:00+07', 65000, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
     ('6ebcaab2-e385-448c-b4a1-ed9c7381bad5', '7978be2c-33c2-46a5-9a02-c1fac4454122', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-07-04 18:00:00+07', '2026-07-04 19:49:00+07', 85000, 'ACTIVE')
@@ -279,24 +234,6 @@ INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, bas
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
     ('72ad3980-b35d-4624-9d07-d67b7a7f2159', 'd123ff46-fa4e-474f-8eef-bb563d776c6c', '0187604c-6937-4781-97e0-4370286e57b4', '2026-07-01 14:00:00+07', '2026-07-01 15:42:00+07', 75000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('0e96dcb6-594a-4957-8de6-a5fd473327dd', 'b0572455-0607-4aa9-946d-b86bfedfea20', '0187604c-6937-4781-97e0-4370286e57b4', '2026-07-04 14:00:00+07', '2026-07-04 15:45:00+07', 75000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('7a4e5b11-2566-476a-a798-e21c30ea4c22', 'b0572455-0607-4aa9-946d-b86bfedfea20', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-26 10:00:00+07', '2026-06-26 11:22:00+07', 65000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('9826114b-e131-4a1f-956f-6bd024837c20', 'b0572455-0607-4aa9-946d-b86bfedfea20', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-07-03 08:00:00+07', '2026-07-03 09:56:00+07', 65000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('bfaf1341-d74c-40b1-93df-9f50ba8a259a', 'c045dbca-5a4a-4675-a6e0-e1a6d423acff', '0187604c-6937-4781-97e0-4370286e57b4', '2026-06-30 09:00:00+07', '2026-06-30 10:59:00+07', 65000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('0b68176f-4376-4156-b06d-2f7fcae843aa', 'c045dbca-5a4a-4675-a6e0-e1a6d423acff', '0187604c-6937-4781-97e0-4370286e57b4', '2026-07-02 21:00:00+07', '2026-07-02 22:44:00+07', 85000, 'ACTIVE')
-ON CONFLICT DO NOTHING;
-INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
-    ('5d40e724-650e-4809-bed5-3793e75e2cf2', 'c045dbca-5a4a-4675-a6e0-e1a6d423acff', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-07-03 15:00:00+07', '2026-07-03 16:44:00+07', 75000, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 INSERT INTO showtimes (showtime_id, movie_id, room_id, start_time, end_time, base_price, status) VALUES
     ('2269b200-42cb-4d6c-b33a-1031ba7321d8', '6817a704-f3d9-4595-90c4-9fd525c12220', 'd98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', '2026-06-25 13:00:00+07', '2026-06-25 14:36:00+07', 75000, 'ACTIVE')

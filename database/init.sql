@@ -68,9 +68,12 @@ CREATE TABLE movies (
     description         TEXT,
     duration            INT NOT NULL CHECK (duration > 0),
     language            VARCHAR(50) NOT NULL DEFAULT 'Tiếng Việt',
+    language_display    VARCHAR(255) DEFAULT 'Đang cập nhật',
     age_rating          age_rating NOT NULL DEFAULT 'P',
     trailer_url         TEXT,
     poster_url          TEXT,
+    director            VARCHAR(255) NOT NULL DEFAULT 'Đang cập nhật',
+    actors              TEXT DEFAULT 'Đang cập nhật',
     showing_start_date  DATE NOT NULL,
     showing_end_date    DATE NOT NULL,
     status              entity_status NOT NULL DEFAULT 'COMING_SOON',
@@ -286,14 +289,49 @@ INSERT INTO seat_types (seat_type_id, type_name, price_multiplier, color_hex) VA
     ('a0000001-0000-0000-0000-000000000002', 'VIP', 1.50, '#FF9800'),
     ('a0000001-0000-0000-0000-000000000003', 'Couple', 2.00, '#E91E63');
 
--- Genres
+-- Genres (UUIDs matching seed_tvmaze_data.sql)
 INSERT INTO genres (genre_id, name, slug) VALUES
-    ('b0000001-0000-0000-0000-000000000001', 'Hành động', 'hanh-dong'),
-    ('b0000001-0000-0000-0000-000000000002', 'Hài hước', 'hai-huoc'),
-    ('b0000001-0000-0000-0000-000000000003', 'Tình cảm', 'tinh-cam'),
-    ('b0000001-0000-0000-0000-000000000004', 'Kinh dị', 'kinh-di'),
-    ('b0000001-0000-0000-0000-000000000005', 'Khoa học viễn tưởng', 'khoa-hoc-vien-tuong'),
-    ('b0000001-0000-0000-0000-000000000006', 'Hoạt hình', 'hoat-hinh');
+    ('5bd179a4-6292-4424-8dda-56d3f2f40152', 'Hành động', 'hanh-dong'),
+    ('ad0d02bc-a632-4113-bde7-5e4f6fe4edf6', 'Hài hước', 'hai-huoc'),
+    ('1a409ed9-2b35-40b0-b677-14485b3c3db9', 'Tình cảm', 'tinh-cam'),
+    ('649b127c-61ff-43fc-af78-296ab910d1f5', 'Kinh dị', 'kinh-di'),
+    ('1cc4d0e1-6465-4b62-ba55-acfbe63d13cf', 'Khoa học viễn tưởng', 'khoa-hoc-vien-tuong'),
+    ('9d56ed24-3baa-417b-afa4-985f62bcfc4f', 'Hoạt hình', 'hoat-hinh'),
+    ('b0000001-0000-0000-0000-000000000007', 'Tội phạm', 'toi-pham'),
+    ('b0000001-0000-0000-0000-000000000008', 'Chính kịch', 'chinh-kich');
+
+-- Rooms (matching seed_showtimes.sql)
+INSERT INTO rooms (room_id, room_name, total_rows, total_columns) VALUES
+    ('0187604c-6937-4781-97e0-4370286e57b4', 'Phòng Chiếu 1', 8, 10),
+    ('d98fe864-3f9e-4743-9e1b-5e3ca9b2aae4', 'Phòng Chiếu 2', 8, 10);
+
+-- Seats for both rooms
+DO $$
+DECLARE
+    room RECORD;
+    r INT;
+    c INT;
+    row_label VARCHAR;
+    seat_type_id UUID;
+BEGIN
+    FOR room IN SELECT room_id FROM rooms LOOP
+        FOR r IN 1..8 LOOP
+            row_label := CHR(64 + r);
+            FOR c IN 1..10 LOOP
+                -- Standard seats except couple seats in last row
+                IF r = 8 THEN
+                    seat_type_id := 'a0000001-0000-0000-0000-000000000003'; -- Couple
+                ELSEIF r <= 2 THEN
+                    seat_type_id := 'a0000001-0000-0000-0000-000000000002'; -- VIP
+                ELSE
+                    seat_type_id := 'a0000001-0000-0000-0000-000000000001'; -- Standard
+                END IF;
+                INSERT INTO seats (room_id, seat_type_id, row_label, seat_number)
+                VALUES (room.room_id, seat_type_id, row_label, c);
+            END LOOP;
+        END LOOP;
+    END LOOP;
+END $$;
 
 -- Sample combos
 INSERT INTO combos (combo_id, combo_name, description, price, image_url) VALUES
